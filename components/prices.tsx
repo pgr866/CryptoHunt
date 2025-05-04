@@ -51,7 +51,7 @@ export default function PricesPage() {
     const fetchData = async () => {
       setLoading(true)
       try {
-        const res = await axios.get('http://localhost:3000/api/coins', {
+        const res = await axios.get(`${process.env.NEXTAUTH_URL}/api/coins`, {
           params: {
             per_page: 100,
             page,
