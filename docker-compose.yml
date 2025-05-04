@@ -1,0 +1,27 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports: ["3000:3000"]
+    develop: { watch: [ { action: sync, path: ., target: /app, ignore: [node_modules/] } ] } # docker compose up --build --watch
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/mydb
+      - NODE_ENV=development
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17.4
+    restart: always
+    ports: ["5432:5432"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
