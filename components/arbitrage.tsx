@@ -59,8 +59,8 @@ export default function ArbitragePage() {
     const fetchData = async () => {
       try {
         const [historyRes, coinsRes] = await Promise.all([
-          axios.get(`${process.env.NEXTAUTH_URL}/api/arbitrage-history`),
-          axios.get(`${process.env.NEXTAUTH_URL}/api/coins`, {
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/arbitrage-history`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/coins`, {
             params: { per_page: 100, page: 1 },
           }),
         ]);
@@ -78,7 +78,7 @@ export default function ArbitragePage() {
   const fetchArbitrage = async () => {
     setLoading(true);
     try {
-      const res = await axios.post(`${process.env.NEXTAUTH_URL}/api/arbitrage?id=${selectedCoin.id}`);
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/arbitrage?id=${selectedCoin.id}`);
       const arbitrageData: ArbitrageData = res.data;
       setArbitrage(arbitrageData);
       setSearchedCoin(selectedCoin);

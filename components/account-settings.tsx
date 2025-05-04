@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import axios from 'axios'
 import { useRouter } from "next/navigation"
 import { signOut } from 'next-auth/react'
 import { toast } from "sonner"
@@ -49,35 +50,22 @@ export function AccountSettingsPage() {
 
     setIsLoading(true)
     try {
-      const updatedData: any = {}
-
-      if (username) updatedData.username = username
-      if (email) updatedData.email = email
-      if (password) updatedData.password = password
-
-      if (session?.user?.id) {
-        updatedData.id = session.user.id
+      const updatedData: any = {
+        username,
+        email,
+        password,
+        id: session?.user?.id,
       }
 
-      const response = await fetch("/api/update-user", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
-      })
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/update-user`,
+        updatedData
+      )
 
-      if (!response.ok) {
-        const data = await response.json()
-        toast.error(data.message || "Failed to update account")
-        return
-      }
-
-      const data = await response.json()
-      update({ user: { ...session.user, ...data.user } });
-      toast.success(data.message || "Account updated successfully")
+      update({ user: { ...session.user, ...response.data.user } })
+      toast.success(response.data.message || "Account updated successfully")
     } catch (error: any) {
-      toast.error(error?.message || "An error occurred while updating the account")
+      toast.error(error?.response?.data?.message || "An error occurred while updating the account")
     } finally {
       setIsLoading(false)
     }
@@ -86,25 +74,16 @@ export function AccountSettingsPage() {
   const handleDeleteAccount = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch("/api/delete-user", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        toast.error(data.message || "Failed to delete account")
-        return
-      }
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/delete-user`,
+        { data: { email, password } }
+      )
 
       await signOut({ redirect: false })
-      toast.success("Account deleted successfully")
+      toast.success(response.data.message || "Account deleted successfully")
       router.push("/signin")
-    } catch (error) {
-      toast.error("An error occurred while deleting the account")
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "An error occurred while deleting the account")
     } finally {
       setIsLoading(false)
     }

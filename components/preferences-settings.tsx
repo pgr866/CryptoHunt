@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import axios from 'axios';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
@@ -18,31 +19,24 @@ export function PreferencesSettingsPage() {
   const handleUpdateTimezone = async () => {
     try {
       setIsLoading(true);
+
       if (!session?.user?.id) {
-        toast("User ID is missing");
+        toast.error("User ID is missing");
         return;
       }
-      const response = await fetch('/api/update-user', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: session.user.id,
-          timezone: selectedTimezone,
-        }),
+
+      const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/update-user`, {
+        id: session.user.id,
+        timezone: selectedTimezone,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        update({ user: { ...session.user, timezone: selectedTimezone } });
-        toast("Preferences updated successfully");
-      } else {
-        const data = await response.json();
-        toast("Failed to update preferences", { description: data.message });
-      }
-    } catch (error) {
-      toast("Failed to update preferences", { description: error.message || "An error occurred." });
+      update({ user: { ...session.user, timezone: selectedTimezone } });
+      toast.success("Preferences updated successfully");
+
+    } catch (error: any) {
+      toast.error("Failed to update preferences", {
+        description: error?.response?.data?.message || error.message || "An error occurred.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -59,15 +53,15 @@ export function PreferencesSettingsPage() {
         <div className="flex items-center mb-2">
           <Label>Timezone</Label>
         </div>
-        <Combobox 
-          value={selectedTimezone} 
-          values={timezones} 
-          variant={"outline"} 
-          size={"default"} 
-          width={"300px"} 
-          placeholder={"Timezone"} 
-          onChange={(value) => setSelectedTimezone(value)} 
-          icon={<ClockFading />} 
+        <Combobox
+          value={selectedTimezone}
+          values={timezones}
+          variant={"outline"}
+          size={"default"}
+          width={"300px"}
+          placeholder={"Timezone"}
+          onChange={(value) => setSelectedTimezone(value)}
+          icon={<ClockFading />}
         />
         <p className="text-sm text-muted-foreground">Select the timezone you want to use across the platform.</p>
       </div>

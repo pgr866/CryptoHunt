@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import axios from 'axios'
 import { useRouter } from "next/navigation"
 import { Loader2, Eye, EyeClosed } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -37,11 +38,12 @@ export default function SignUpPage() {
 
     setIsLoading(true)
     try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC' }),
-      })
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
+        username,
+        email,
+        password,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC',
+      });
 
       const data = await res.json()
 
