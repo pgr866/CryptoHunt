@@ -38,26 +38,18 @@ export default function SignUpPage() {
 
     setIsLoading(true)
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
         username,
         email,
         password,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC',
       });
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        toast.error("Sign-up failed", {
-          description: data?.message || "Error creating account",
-        })
-        return
-      }
-
       toast.success("Sign-up successful")
       router.push("/signin")
-    } catch (error) {
-      toast.error("Something went wrong")
+    } catch (error: any) {
+      toast.error("Sign-up failed", {
+        description: error.response?.data?.message || "Something went wrong",
+      })
     } finally {
       setIsLoading(false)
     }
