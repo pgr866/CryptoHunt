@@ -33,7 +33,7 @@ export default function HomePage() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (status === 'authenticated' && !session?.user) {
+    if (status === 'unauthenticated' && !session?.user) {
       router.push('/signin');
     }
   }, [status, session, router]);

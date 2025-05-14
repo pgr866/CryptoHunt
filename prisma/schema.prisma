@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated"
 }
 
 datasource db {
@@ -48,7 +49,7 @@ model VerificationToken {
 model ArbitrageHistory {
   id                  String   @id @default(cuid())
   userId              String
-  user                User     @relation(fields: [userId], references: [id])
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   coinName            String
   timestamp           BigInt
   lowestExchange      String
